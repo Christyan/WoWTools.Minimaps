@@ -1,6 +1,6 @@
 ﻿using SereniaBLPLib;
+using SixLabors.ImageSharp;
 using System;
-using System.Drawing;
 using System.IO;
 
 namespace WoWTools.MinimapCompile
@@ -21,7 +21,7 @@ namespace WoWTools.MinimapCompile
             var outpng = args[1];
 
             var blpRes = 512;
-            if(args.Length == 3)
+            if (args.Length == 3)
                 blpRes = int.Parse(args[2]);
 
             if (blpRes != 1024 && blpRes != 512 && blpRes != 256)
@@ -44,7 +44,7 @@ namespace WoWTools.MinimapCompile
                 }
             }
 
-            if(numMinimaps == 0)
+            if (numMinimaps == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("No minimaps found in directory, make sure to specify a directory that has map_xx_yy.blp files.");
@@ -67,7 +67,9 @@ namespace WoWTools.MinimapCompile
                         var tile = Path.Combine(indir, "map" + cur_x.ToString().PadLeft(2, '0') + "_" + cur_y.ToString().PadLeft(2, '0') + ".blp");
                         if (File.Exists(tile))
                         {
-                            new BlpFile(File.OpenRead(tile)).GetBitmap(0).Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                            using Stream tileStream = File.Open(tile, FileMode.Open);
+                            var blpFile = new BlpFile(tileStream);
+                            blpFile.GetImage(blpFile.MipMapCount).SaveAsPng(stream);
                             var image = NetVips.Image.NewFromBuffer(stream.ToArray());
 
                             if (image.Width != blpRes)
@@ -90,15 +92,15 @@ namespace WoWTools.MinimapCompile
                         }
                     }
 
-                    if(progress % 100 == 0)
+                    if (progress % 100 == 0)
                     {
-                        if(progress != prevProgress)
+                        if (progress != prevProgress)
                         {
                             Console.Write("\rReading tile: " + progress + "/" + numMinimaps);
                             prevProgress = progress;
                         }
                     }
-                    else if(progress == numMinimaps && progress != prevProgress)
+                    else if (progress == numMinimaps && progress != prevProgress)
                     {
                         Console.WriteLine("\rReading tile: " + progress + "/" + numMinimaps);
                         prevProgress = progress;
