@@ -1,4 +1,5 @@
 ﻿using SereniaBLPLib;
+using SixLabors.ImageSharp;
 using System;
 using System.Drawing;
 using System.IO;
@@ -50,7 +51,9 @@ namespace WoWTools.MinimapCompileWMO
                         var tile = Path.Combine(indir, "map" + cur_x.ToString().PadLeft(2, '0') + "_" + cur_y.ToString().PadLeft(2, '0') + ".blp");
                         if (File.Exists(tile))
                         {
-                            new BlpFile(File.OpenRead(tile)).GetBitmap(0).Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                            using Stream tileStream = File.Open(tile, FileMode.Open);
+                            var blpFile = new BlpFile(tileStream);
+                            blpFile.GetImage(blpFile.MipMapCount).SaveAsPng(stream);
                             var image = NetVips.Image.NewFromBuffer(stream.ToArray());
 
                             if (image.Width != blpRes)
