@@ -9,10 +9,10 @@ namespace WoWTools.MinimapCompile
     {
         static void Main(string[] args)
         {
-            //if (args.Length < 2)
-            //{
-            //    throw new Exception("Not enough arguments, need indir, outpng, (res (256 or 512 or 1024))");
-            //}
+            if (args.Length < 2)
+            {
+                throw new Exception("Not enough arguments, need indir, outpng, (res (256 or 512 or 1024))");
+            }
 
             var min_x = 64;
             var min_y = 64;
