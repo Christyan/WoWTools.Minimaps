@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace WoWTools.MinimapExtract
 {
@@ -13,7 +14,7 @@ namespace WoWTools.MinimapExtract
         public static Dictionary<int, string> Listfile = new();
         public static Dictionary<string, int> ListfileReverse = new();
         public static CASCHandler cascHandler;
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (args.Length < 2)
             {
@@ -87,7 +88,7 @@ namespace WoWTools.MinimapExtract
 
                     List<string> tactKeyLines = new();
                     using (var w = new HttpClient())
-                    using (var s = w.GetStreamAsync("https://github.com/wowdev/TACTKeys/raw/master/WoW.txt").Result)
+                    using (var s = await w.GetStreamAsync("https://github.com/wowdev/TACTKeys/raw/master/WoW.txt"))
                     using (var sr = new StreamReader(s))
                     {
                         while (!sr.EndOfStream)
@@ -142,7 +143,7 @@ namespace WoWTools.MinimapExtract
                     Console.WriteLine("Downloading listfile");
 
                     using (var w = new HttpClient())
-                    using (var s = w.GetStreamAsync("https://github.com/wowdev/wow-listfile/releases/latest/download/community-listfile.csv").Result)
+                    using (var s = await w.GetStreamAsync("https://github.com/wowdev/wow-listfile/releases/latest/download/community-listfile.csv"))
                     {
                         using var fs = new FileStream("listfile.csv", FileMode.OpenOrCreate);
                         s.CopyTo(fs);
